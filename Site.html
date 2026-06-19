@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fireninja</title>
+    <!-- FontAwesome for custom icons -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- Google Fonts: Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Custom Stylesheet & Script -->
+    <link href="styles.css" rel="stylesheet">
+    <script src="images.js" defer></script>
+    <script src="script.js" defer></script>
+</head>
+<body>
+    <div class="app-container">
+        
+        <!-- ==========================================
+             A. HEADER PROFILE / BRANDING REGION
+             ========================================== -->
+        <header class="profile-header">
+            <div class="profile-info-block">
+                <!-- Glowing Profile Picture Ring -->
+                <div class="avatar-container">
+                    <div class="avatar-outline"></div>
+                    <img id="profile-pic" class="avatar-pic" src="https://ik.imagekit.io/fireninja/download.gif" alt="Fireninja" onerror="this.src='https://placehold.co/150x150/0f172a/f97316?text=F'">
+                </div>
+
+                <div class="profile-text">
+                    <div class="profile-name-row">
+                        <h1 class="display-title" id="display-name">Fireninja</h1>
+                        <i class="fa-solid fa-fire-flame-curved verified-star" title="Hobbyist Render Artist"></i>
+                        <!-- Copyable Discord Button -->
+                        <div class="discord-copy-pill" onclick="copyDiscordName()" title="Copy Discord handle">
+                            <i class="fa-brands fa-discord"></i>
+                            <span id="discord-tag-display">fireninja_</span>
+                            <i class="fa-regular fa-copy" style="opacity: 0.6; font-size: 0.7rem;"></i>
+                        </div>
+                    </div>
+                    <p class="casual-bio">
+                        Casual 3D artist.<br>
+                        I also like to read books.
+                        
+                    </p>
+                </div>
+            </div>
+
+            <!-- Live Discord Presence Widget Integration -->
+            <div class="discord-widget-container">
+                <img class="discord-widget-img" src="https://discord.c99.nl/widget/theme-2/622767048224931843.png" alt="Discord Status" onerror="this.style.display='none'">
+            </div>
+        </header>
+
+        <!-- ==========================================
+             B. COZY SOLO.TO QUICK LINKS GRID
+             ========================================== -->
+        <nav class="links-grid" id="links-container">
+            <!-- Loaded dynamically from Javascript at bottom -->
+        </nav>
+
+        <!-- ==========================================
+             C. EXPANSIVE RENDER GALLERY (Masonry Flow)
+             ========================================== -->
+        <main class="gallery-section">
+            <header class="gallery-header">
+                <h2 class="gallery-title">Renders Gallery</h2>
+                <span class="gallery-counter" id="gallery-count">0 Projects</span>
+            </header>
+
+            <!-- Masonry Column Matrix -->
+            <div class="gallery-masonry" id="gallery-container">
+                <!-- Injected dynamically from rendersDatabase array -->
+            </div>
+
+            <!-- Page Expansion button -->
+            <div class="load-more-container">
+                <button class="btn-load-more" id="load-more-btn" onclick="increasePageLimit()">
+                    Show More Renders
+                </button>
+            </div>
+        </main>
+
+    </div>
+
+    <!-- ==========================================
+         D. INTERACTIVE DETAIL LIGHTBOX (Modal Viewport)
+         ========================================== -->
+    <div class="lightbox" id="viewer-lightbox" onclick="dismissLightbox()">
+        <div class="lightbox-window" onclick="event.stopPropagation()">
+            
+            <!-- Close Modal trigger -->
+            <button class="lightbox-close-btn" onclick="dismissLightbox()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+
+            <!-- Left pane: Main Viewport -->
+            <div class="lightbox-viewport">
+                <img class="lightbox-active-img" id="lightbox-main-img" src="" alt="Active View">
+            </div>
+
+            <!-- Right pane: Metadata Deck & Alternate Thumbnails -->
+            <div class="lightbox-deck">
+                <div class="deck-header">
+                    <h3 class="deck-title" id="lightbox-title">Render Project</h3>
+                    <p class="deck-desc" id="lightbox-desc">Cycles Render // Engine Details</p>
+                    
+                    <div class="variation-wrap" id="variations-wrapper">
+                        <span class="variation-header">Project Variations</span>
+                        <div class="variation-grid" id="variations-container"></div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Actions notification alert popup -->
+    <div class="toast-msg" id="alert-toast">
+        <i class="fa-solid fa-circle-check"></i>
+        <span id="toast-text-box">Discord Username Copied!</span>
+    </div>
+</body>
+</html>
