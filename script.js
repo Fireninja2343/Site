@@ -11,7 +11,7 @@ const linksDatabase = [
     {
         title: "The Storygraph Hub",
         subtitle: "Tracking my reading stats",
-        url: "https://thestorygraph.com",
+        url: "https://app.thestorygraph.com/profile/fireninja",
         iconClass: "fa-solid fa-book-open"
     },
     {
