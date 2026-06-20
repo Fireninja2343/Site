@@ -54,7 +54,8 @@ const rendersDatabase = [
         desc: "OC render. Just some floating gems.",
         mainImg: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/FloatingGems.mp4",
         variations: [
-            { label: "Main View", url: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/FloatingGems.mp4" },
+            { label: "Animated view", url: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/FloatingGems.mp4",
+                thumb: "https://ik.imagekit.io/fireninja/Untitled2.png?updatedAt=1781901978328", type: "video" },
             { label: "Static View", url: "https://ik.imagekit.io/fireninja/Untitled2.png?updatedAt=1781901978328" }
         ]
     }, 

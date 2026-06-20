@@ -343,7 +343,7 @@ body {
 .card-hover-overlay {
     position: absolute;
     inset: 0;
-    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 15%, transparent 100%);
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 25%, transparent 40%);
     display: flex;
     flex-direction: column;
     justify-content: flex-end;
@@ -351,6 +351,10 @@ body {
     opacity: 0;
     transition: opacity var(--transition-speed) ease;
     pointer-events: none; /* Let clicks pass directly through to indicators */
+}
+
+.card-hover-overlay.no-variants {
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 40px, transparent 40%);
 }
 
 .gallery-card:hover .card-hover-overlay {
@@ -368,8 +372,12 @@ body {
     color: var(--accent-color);
     font-weight: 600;
     margin-top: 1px;
-    margin-bottom: 48px;
+    margin-bottom: 46px;
 }
+.overlay-variant-count.no-variants {
+    margin-bottom: 8px;
+}
+
 
 /* ==========================================
     5. ACTIVE DIRECT-CARD VARIATION SWAPPER
@@ -421,6 +429,21 @@ body {
 .mini-swapper-box.active {
     border-color: var(--accent-color);
     box-shadow: 0 0 8px var(--accent-color);
+}
+
+.var-video-badge {
+    position: absolute;
+    top: 4px;
+    left: 4px;
+    font-size: 0.8rem;
+    color: white;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+}
+
+.gallery-card:hover .var-video-badge {
+    opacity: 0.95;
 }
 
 /* Pagination Load More Button style */

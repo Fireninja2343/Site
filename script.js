@@ -74,9 +74,9 @@ function bootstrapGallery() {
                 : `<img class="render-thumbnail" id="card-img-${index}" src="${render.mainImg}" alt="${render.title}"
                         onerror="this.src='https://placehold.co/600x600/0f121d/f97316?text=Render'">`
             }
-            <div class="card-hover-overlay">
+            <div class="card-hover-overlay ${render.variations && render.variations.length > 1 ? '' : 'no-variants'}">
                 <span class="overlay-title">${render.title}</span>
-                <span class="overlay-variant-count">
+                <span class="overlay-variant-count ${render.variations && render.variations.length > 1 ? '' : 'no-variants'}">
                     <i class="fa-solid fa-images"></i> ${render.variations ? render.variations.length : 1} Views
                 </span>
             </div>
@@ -84,15 +84,21 @@ function bootstrapGallery() {
         `;
 
         container.appendChild(card);
-
         // Inject mini swappers inside indicator bar
         const bar = document.getElementById(`indicator-bar-${index}`);
         if (render.variations && render.variations.length > 1) {
             render.variations.forEach((variant, vIdx) => {
+                const isVarVideo = variant.type === "video";
+                const variantSrc = isVarVideo ? variant.thumb : variant.url;
                 const box = document.createElement('div');
                 box.className = `mini-swapper-box${vIdx === 0 ? ' active' : ''}`;
                 box.title = variant.label;
-                box.innerHTML = `<img src="${variant.url}" alt="${variant.label}">`;
+                box.innerHTML = `
+                    <div style="position:relative; display:inline-block;">
+                        <img src="${variantSrc}" alt="${variant.label}">
+                        ${variant.type === "video" ? `<i class="var-video-badge fa-solid fa-video"></i>` : ''}
+                    </div>
+                `;
 
                 box.onclick = (e) => {
                     e.stopPropagation();
@@ -155,6 +161,7 @@ function increasePageLimit() {
     maxDisplayedRenders += 6;
     bootstrapGallery();
 }
+
 // Lightbox modal controller
 function revealLightbox(index) {
     const render = rendersDatabase[index];
@@ -242,9 +249,13 @@ function revealLightbox(index) {
                     }, 120);
                 }
             };
-
+            const isVarVideo = variant.type === "video";
+            const variantSrc = isVarVideo ? variant.thumb : variant.url;
             btn.innerHTML = `
-                <img class="variation-preview-img" src="${variant.url}" alt="${variant.label}" onerror="this.src='https://placehold.co/150x100/0f121d/f97316?text=View'">
+                <div style="position:relative; display:inline-block;">
+                    <img class="variation-preview-img" src="${variantSrc}" alt="${variant.label}" onerror="this.src='https://placehold.co/150x100/0f121d/f97316?text=View'">
+                    ${variant.type === "video" ? `<i class="fa-solid fa-video" style="position:absolute; top:10%; left:10%; transform:translate(-10%,-10%); font-size:1.4rem; color:white; opacity:0.9; pointer-events:none;"></i>` : ''}
+                </div>
                 <span class="variation-label">${variant.label}</span>
             `;
             variationsContainer.appendChild(btn);
