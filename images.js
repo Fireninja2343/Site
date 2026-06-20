@@ -8,7 +8,6 @@ const rendersDatabase = [
             { label:"Main View", url: "https://ik.imagekit.io/fireninja/Spear3.png?updatedAt=1781901982859" },
             { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Spear2.png?updatedAt=1781901981541" },
             { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Spear1.png?updatedAt=1781901980573" },
-            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Spear.png?updatedAt=1781901971272" }
         ]
     },
     {
