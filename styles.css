@@ -62,7 +62,31 @@ body {
     max-width: 1200px;
     display: flex;
     flex-direction: column;
-    gap: 32px;
+    gap: 16px;
+}
+
+/* Scrollbar styling for WebKit browsers */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: linear-gradient(180deg, hsl(10, 100%, 15%), hsl(30, 100%, 15%));
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, hsl(10, 100%, 30%), hsl(30, 100%, 30%));
+    border-radius: 999px;
+    box-shadow: 0 0 20px 10px color-mix(in srgb, var(--accent-color) 20%, transparent);
+    border: 2px solid color-mix(in srgb, var(--accent-color) 15%, transparent);
+    background-clip: padding-box;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, hsl(10, 100%, 45%), hsl(30, 100%, 45%));
+    box-shadow: 0 0 20px 20px color-mix(in srgb, var(--accent-color) 30%, transparent);
+    border: 2px solid color-mix(in srgb, var(--accent-color) 25%, transparent);
+    background-clip: padding-box;
 }
 
 /* ==========================================
