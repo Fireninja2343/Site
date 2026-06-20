@@ -67,7 +67,7 @@ body {
 
 /* Scrollbar styling for WebKit browsers */
 ::-webkit-scrollbar {
-    width: 10px;
+    width: 14px;
 }
 
 ::-webkit-scrollbar-track {
@@ -330,22 +330,21 @@ body {
     border-radius: 99px;
 }
 
-/* Masonry Grid to support mixed aspect ratios */
+
 .gallery-masonry {
-    columns: 4 240px;
-    column-gap: 16px;
     width: 100%;
 }
 
 .gallery-card {
-    break-inside: avoid;
+    width: calc(25% - 12px);
+    min-height: 120px;
     margin-bottom: 16px;
     position: relative;
     border-radius: 14px;
     overflow: hidden;
     cursor: pointer;
     border: 1px solid var(--border-color);
-    background: #0d111a;
+    background: var(--container-bg);
     transition: transform var(--transition-speed) ease, border-color var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
 }
 
@@ -358,10 +357,54 @@ body {
 
 .render-thumbnail {
     width: 100%;
+    min-height: 120px;
     height: auto;
+    object-fit: contain;
     display: block;
     transition: transform 0.4s ease;
 }
+
+@media (max-width: 900px) {
+    .profile-header {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 20px;
+    }
+    .discord-widget-container {
+        max-width: 100%;
+        justify-content: flex-start;
+    }
+    .gallery-card {
+        width: calc(50% - 8px);
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-card {
+        width: 100%;
+    }
+}
+
+.gallery-card:hover {
+    transform: scale(1.015);
+    border-color: var(--accent-color);
+    box-shadow: 0 8px 20px var(--accent-glow);
+    z-index: 10;
+}
+
+.video-timer {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+    z-index: 15;
+    font-variant-numeric: tabular-nums;
+    pointer-events: none;
+}
+
 
 /* Overlay information panel on hover */
 .card-hover-overlay {
@@ -389,7 +432,9 @@ body {
     font-weight: 700;
     font-size: 0.85rem;
     color: #fff;
+    text-shadow: 0 1px 1px 20px rgba(0, 0, 0, 1);
 }
+
 
 .overlay-variant-count {
     font-size: 0.7rem;
@@ -417,6 +462,7 @@ body {
 
 /* Small pixel boxes by default */
 .mini-swapper-box {
+    position: relative;
     width: 10px;
     height: 10px;
     background: rgba(255, 255, 255, 0.4);
@@ -429,23 +475,21 @@ body {
                 border-color 0.2s ease, 
                 opacity 0.2s ease;
 }
-
 .mini-swapper-box img {
     width: 100%;
     height: 100%;
     object-fit: cover;
     opacity: 0;
     transition: opacity 0.2s ease;
+    display: block;
 }
 
-/* Expand indicator boxes on parent card hover */
 .gallery-card:hover .mini-swapper-box {
     width: 38px;
     height: 38px;
     border-color: rgba(255, 255, 255, 0.8);
     background: #000;
 }
-
 .gallery-card:hover .mini-swapper-box img {
     opacity: 1;
 }
@@ -470,33 +514,8 @@ body {
     opacity: 0.95;
 }
 
-/* Pagination Load More Button style */
-.load-more-container {
-    display: flex;
-    justify-content: center;
-    margin-top: 24px;
-}
-
-.btn-load-more {
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid var(--border-color);
-    color: var(--text-main);
-    padding: 10px 24px;
-    border-radius: 12px;
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 0.85rem;
-    transition: all var(--transition-speed) ease;
-}
-
-.btn-load-more:hover {
-    background: rgba(255, 255, 255, 0.07);
-    border-color: var(--text-muted);
-    transform: translateY(-1px);
-}
-
 /* ==========================================
-    6. PREMIUM LIGHTBOX WITH VARIATIONS
+    6. LIGHTBOX WITH VARIATIONS
     ========================================== */
 .lightbox {
     position: fixed;
@@ -528,11 +547,12 @@ body {
     width: 100%;
     display: grid;
     grid-template-columns: 1fr 300px;
-    height: 70vh;
+    height: 80vh;
     overflow: hidden;
     box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
     position: relative;
 }
+
 
 /* Left Side: Viewport Display Area */
 .lightbox-viewport {
@@ -561,6 +581,22 @@ body {
     flex-direction: column;
     justify-content: space-between;
     overflow-y: auto;
+}
+.lightbox-deck::-webkit-scrollbar-track {
+    background: transparent;
+    border-radius: 999px;
+    overflow: hidden;
+}
+
+.lightbox-deck::-webkit-scrollbar-thumb {
+    border-radius: 999px;
+    box-shadow: none;
+    border: 2px solid transparent;
+}
+
+.lightbox-deck::-webkit-scrollbar-thumb:hover {
+    box-shadow: none;
+    border: 2px solid transparent;
 }
 
 .deck-header {

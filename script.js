@@ -1,4 +1,5 @@
 const discordUserTag = "fireninja.";
+let msnry;
 
 const linksDatabase = [
     {
@@ -22,8 +23,6 @@ const linksDatabase = [
 ];
 
 
-// Pagination parameters
-let maxDisplayedRenders = 6;
 
 // Generate custom Solo.to link boxes at top of dashboard
 function bootstrapLinks() {
@@ -53,9 +52,7 @@ function bootstrapGallery() {
     const container = document.getElementById('gallery-container');
     container.innerHTML = '';
 
-    const subset = rendersDatabase.slice(0, maxDisplayedRenders);
-
-    subset.forEach((render, index) => {
+    rendersDatabase.forEach((render, index) => {
         const card = document.createElement('div');
         card.className = 'gallery-card';
         card.id = `gallery-card-${index}`;
@@ -82,6 +79,27 @@ function bootstrapGallery() {
             </div>
             <div class="card-variations-bar" id="indicator-bar-${index}"></div>
         `;
+        if (isVideo) {
+            const timer = document.createElement('span');
+            timer.className = 'video-timer';
+            timer.innerText = '00:00';
+            card.appendChild(timer);
+
+            const vid = card.querySelector('.render-thumbnail');
+            vid.addEventListener('loadedmetadata', () => {
+                const duration = Math.floor(vid.duration);
+                const mins = String(Math.floor(duration / 60)).padStart(2, '0');
+                const secs = String(duration % 60).padStart(2, '0');
+                timer.innerText = `${mins}:${secs}`;
+            });
+
+            vid.addEventListener('timeupdate', () => {
+                const remaining = Math.floor(vid.duration - vid.currentTime);
+                const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+                const secs = String(remaining % 60).padStart(2, '0');
+                timer.innerText = `${mins}:${secs}`;
+            });
+        }
 
         container.appendChild(card);
         // Inject mini swappers inside indicator bar
@@ -94,15 +112,13 @@ function bootstrapGallery() {
                 box.className = `mini-swapper-box${vIdx === 0 ? ' active' : ''}`;
                 box.title = variant.label;
                 box.innerHTML = `
-                    <div style="position:relative; display:inline-block;">
-                        <img src="${variantSrc}" alt="${variant.label}">
-                        ${variant.type === "video" ? `<i class="var-video-badge fa-solid fa-video"></i>` : ''}
-                    </div>
+                    <img src="${variantSrc}" alt="${variant.label}">
+                    ${variant.type === "video" ? `<i class="var-video-badge fa-solid fa-video"></i>` : ''}
                 `;
 
                 box.onclick = (e) => {
                     e.stopPropagation();
-
+                    
                     const siblings = bar.querySelectorAll('.mini-swapper-box');
                     siblings.forEach(sib => sib.classList.remove('active'));
                     box.classList.add('active');
@@ -118,6 +134,7 @@ function bootstrapGallery() {
                             mediaNode.src = variant.url;
                             if (varIsVideo) mediaNode.load?.();
                             mediaNode.style.opacity = '1';
+                            setTimeout(() => msnry?.layout(), 150);
                         }, 100);
                     } else if (varIsVideo) {
                         // Switching image → video
@@ -130,6 +147,7 @@ function bootstrapGallery() {
                         vid.muted = true;
                         vid.setAttribute('playsinline', '');
                         mediaNode.replaceWith(vid);
+                        setTimeout(() => msnry?.layout(), 150);
                     } else {
                         // Switching video → image
                         const img = document.createElement('img');
@@ -139,6 +157,7 @@ function bootstrapGallery() {
                         img.alt = render.title;
                         img.onerror = () => img.src = 'https://placehold.co/600x600/0f121d/f97316?text=Render';
                         mediaNode.replaceWith(img);
+                        setTimeout(() => msnry?.layout(), 150);
                     }
                 };
 
@@ -149,18 +168,18 @@ function bootstrapGallery() {
 
     document.getElementById('gallery-count').innerText = `${rendersDatabase.length} Projects`;
 
-    const btn = document.getElementById('load-more-btn');
-    if (maxDisplayedRenders >= rendersDatabase.length) {
-        btn.style.display = 'none';
-    } else {
-        btn.style.display = 'block';
-    }
+    const grid = document.getElementById('gallery-container');
+    imagesLoaded(grid, () => {
+        msnry = new Masonry(grid, {
+            itemSelector: '.gallery-card',
+            columnWidth: '.gallery-card',
+            gutter: 16,
+            fitWidth: false
+        });
+        setTimeout(() => msnry.layout(), 500);
+    });
 }
 
-function increasePageLimit() {
-    maxDisplayedRenders += 6;
-    bootstrapGallery();
-}
 
 // Lightbox modal controller
 function revealLightbox(index) {
@@ -191,6 +210,31 @@ function revealLightbox(index) {
         document.getElementById('lightbox-main-video')?.remove();
         lightboxMedia.style.display = 'block';
         lightboxMedia.src = currentCardImg;
+    }
+
+    const existingTimer = document.getElementById('lightbox-video-timer');
+    if (existingTimer) existingTimer.remove();
+
+    if (isVideo) {
+        const timer = document.createElement('span');
+        timer.id = 'lightbox-video-timer';
+        timer.className = 'video-timer';
+        timer.innerText = '00:00';
+        document.querySelector('.lightbox-viewport').appendChild(timer);
+
+        const vid = document.getElementById('lightbox-main-video');
+        vid.addEventListener('loadedmetadata', () => {
+            const remaining = Math.floor(vid.duration);
+            const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+            const secs = String(remaining % 60).padStart(2, '0');
+            timer.innerText = `${mins}:${secs}`;
+        });
+        vid.addEventListener('timeupdate', () => {
+            const remaining = Math.floor(vid.duration - vid.currentTime);
+            const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+            const secs = String(remaining % 60).padStart(2, '0');
+            timer.innerText = `${mins}:${secs}`;
+        });
     }
 
     document.getElementById('lightbox-title').innerHTML = render.title;
@@ -236,10 +280,31 @@ function revealLightbox(index) {
                         vid.load();
                         vid.style.opacity = '1';
                     }, 120);
+                    const existingTimer = document.getElementById('lightbox-video-timer');
+                    if (existingTimer) existingTimer.remove();
+                    const timer = document.createElement('span');
+                    timer.id = 'lightbox-video-timer';
+                    timer.className = 'video-timer';
+                    timer.innerText = '00:00';
+                    document.querySelector('.lightbox-viewport').appendChild(timer);
+
+                    vid = document.getElementById('lightbox-main-video');
+                    vid.addEventListener('loadedmetadata', () => {
+                        const remaining = Math.floor(vid.duration);
+                        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+                        const secs = String(remaining % 60).padStart(2, '0');
+                        timer.innerText = `${mins}:${secs}`;
+                    });
+                    vid.addEventListener('timeupdate', () => {
+                        const remaining = Math.floor(vid.duration - vid.currentTime);
+                        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+                        const secs = String(remaining % 60).padStart(2, '0');
+                        timer.innerText = `${mins}:${secs}`;
+                    });
                 } else {
                     if (vid) {
                         vid.style.opacity = '0';
-                        setTimeout(() => { vid.remove(); }, 120);
+                        setTimeout(() => { vid.remove(); }, 5);
                     }
                     img.style.display = 'block';
                     img.style.opacity = '0';
@@ -247,6 +312,7 @@ function revealLightbox(index) {
                         img.src = variant.url;
                         img.style.opacity = '1';
                     }, 120);
+                    document.getElementById('lightbox-video-timer')?.remove();
                 }
             };
             const isVarVideo = variant.type === "video";
