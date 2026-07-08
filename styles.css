@@ -1,5 +1,4 @@
 :root {
-    /*--bg-color: #0a0605;*/
     --container-bg: rgba(26, 13, 13, 0.4);
     --card-bg: rgba(38, 23, 20, 0.35);
     --border-color: rgba(255, 255, 255, 0.05);
@@ -12,7 +11,7 @@
     --transition-speed: 0.2s;
 }
 
-/* Ambient glowing background spots */
+/* Two large radial blobs — orange top-left, purple bottom-right */
 body::before {
     content: '';
     position: fixed;
@@ -45,7 +44,7 @@ body::after {
 
 body {
     font-family: var(--font-stack);
-    background: linear-gradient(165deg,hsl(10, 100%, 10%), hsl(10, 100%, 6%), hsl(30, 100%, 10%));
+    background: linear-gradient(165deg, hsl(10, 100%, 10%), hsl(10, 100%, 6%), hsl(30, 100%, 10%));
     color: var(--text-main);
     min-height: 100vh;
     padding: 40px 16px;
@@ -56,7 +55,6 @@ body {
     align-items: center;
 }
 
-/* Unified Scrolling Container */
 .app-container {
     width: 100%;
     max-width: 1200px;
@@ -65,7 +63,7 @@ body {
     gap: 16px;
 }
 
-/* Scrollbar styling for WebKit browsers */
+/* Scrollbar — WebKit only (Chrome, Edge, Safari) */
 ::-webkit-scrollbar {
     width: 14px;
 }
@@ -89,9 +87,8 @@ body {
     background-clip: padding-box;
 }
 
-/* ==========================================
-    2. HEADER PROFILE & DISCORD WIDGET LAYOUT
-    ========================================== */
+/* ── HEADER ────────────────────────────────── */
+
 .profile-header {
     background: var(--container-bg);
     backdrop-filter: blur(16px);
@@ -121,6 +118,7 @@ body {
     flex-shrink: 0;
 }
 
+/* Glowing ring behind the avatar — animated via breathe keyframe */
 .avatar-outline {
     position: absolute;
     inset: -3px;
@@ -196,7 +194,6 @@ body {
     line-height: 1.4;
 }
 
-/* Discord widget integration on the right side */
 .discord-widget-container {
     display: flex;
     align-items: center;
@@ -212,9 +209,8 @@ body {
     border: 1px solid var(--border-color);
 }
 
-/* ==========================================
-    3. LINKS REGION
-    ========================================== */
+/* ── LINKS ─────────────────────────────────── */
+
 .links-grid {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
@@ -292,9 +288,8 @@ body {
     color: var(--accent-color);
 }
 
-/* ==========================================
-    4. EXPANSIVE RENDER GALLERY (Masonry Columns)
-    ========================================== */
+/* ── GALLERY ────────────────────────────────── */
+
 .gallery-section {
     background: var(--container-bg);
     backdrop-filter: blur(16px);
@@ -330,7 +325,6 @@ body {
     border-radius: 99px;
 }
 
-
 .gallery-masonry {
     width: 100%;
 }
@@ -364,34 +358,7 @@ body {
     transition: transform 0.4s ease;
 }
 
-@media (max-width: 900px) {
-    .profile-header {
-        flex-direction: column;
-        align-items: flex-start;
-        padding: 20px;
-    }
-    .discord-widget-container {
-        max-width: 100%;
-        justify-content: flex-start;
-    }
-    .gallery-card {
-        width: calc(50% - 8px);
-    }
-}
-
-@media (max-width: 480px) {
-    .gallery-card {
-        width: 100%;
-    }
-}
-
-.gallery-card:hover {
-    transform: scale(1.015);
-    border-color: var(--accent-color);
-    box-shadow: 0 8px 20px var(--accent-glow);
-    z-index: 10;
-}
-
+/* Countdown timer shown on video cards (top-right corner) */
 .video-timer {
     position: absolute;
     top: 8px;
@@ -405,8 +372,7 @@ body {
     pointer-events: none;
 }
 
-
-/* Overlay information panel on hover */
+/* Shown on card hover — gradient fades from bottom so title stays readable */
 .card-hover-overlay {
     position: absolute;
     inset: 0;
@@ -417,9 +383,10 @@ body {
     padding: 12px;
     opacity: 0;
     transition: opacity var(--transition-speed) ease;
-    pointer-events: none; /* Let clicks pass directly through to indicators */
+    pointer-events: none; /* clicks pass through to the variation bar below */
 }
 
+/* Shorter gradient when there's no variation bar to clear */
 .card-hover-overlay.no-variants {
     background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.2) 40px, transparent 40%);
 }
@@ -432,35 +399,34 @@ body {
     font-weight: 700;
     font-size: 0.85rem;
     color: #fff;
-    text-shadow: 0 1px 1px 20px rgba(0, 0, 0, 1);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.8);
 }
-
 
 .overlay-variant-count {
     font-size: 0.7rem;
     color: var(--accent-color);
     font-weight: 600;
     margin-top: 1px;
-    margin-bottom: 46px;
+    margin-bottom: 46px; /* clears the variation bar height */
 }
+
 .overlay-variant-count.no-variants {
     margin-bottom: 8px;
 }
 
+/* ── VARIATION SWAPPER ──────────────────────── */
 
-/* ==========================================
-    5. ACTIVE DIRECT-CARD VARIATION SWAPPER
-    ========================================== */
+/* Sits bottom-right of each card, above the hover overlay */
 .card-variations-bar {
     position: absolute;
     bottom: 12px;
     right: 12px;
     display: flex;
     gap: 6px;
-    z-index: 20; /* Keep it above the overlay pointer rules */
+    z-index: 20;
 }
 
-/* Small pixel boxes by default */
+/* Tiny dot by default, expands to thumbnail on card hover */
 .mini-swapper-box {
     position: relative;
     width: 10px;
@@ -470,11 +436,12 @@ body {
     border-radius: 2px;
     cursor: pointer;
     overflow: hidden;
-    transition: width 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                height 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275), 
-                border-color 0.2s ease, 
+    transition: width 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                height 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275),
+                border-color 0.2s ease,
                 opacity 0.2s ease;
 }
+
 .mini-swapper-box img {
     width: 100%;
     height: 100%;
@@ -490,6 +457,7 @@ body {
     border-color: rgba(255, 255, 255, 0.8);
     background: #000;
 }
+
 .gallery-card:hover .mini-swapper-box img {
     opacity: 1;
 }
@@ -499,6 +467,7 @@ body {
     box-shadow: 0 0 8px var(--accent-color);
 }
 
+/* Video indicator icon — only visible on card hover */
 .var-video-badge {
     position: absolute;
     top: 4px;
@@ -514,9 +483,9 @@ body {
     opacity: 0.95;
 }
 
-/* ==========================================
-    6. LIGHTBOX WITH VARIATIONS
-    ========================================== */
+/* ── LIGHTBOX ───────────────────────────────── */
+
+/* Invisible + non-interactive by default; .active makes it visible */
 .lightbox {
     position: fixed;
     inset: 0;
@@ -538,7 +507,6 @@ body {
     pointer-events: auto;
 }
 
-/* Dual-pane Lightbox Layout */
 .lightbox-window {
     background: rgba(31, 23, 15, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.08);
@@ -553,8 +521,6 @@ body {
     position: relative;
 }
 
-
-/* Left Side: Viewport Display Area */
 .lightbox-viewport {
     background: #0d0706;
     display: flex;
@@ -574,7 +540,6 @@ body {
     transition: opacity 0.2s ease-in-out;
 }
 
-/* Right Side: Information Deck & Variation Carousel */
 .lightbox-deck {
     padding: 24px;
     display: flex;
@@ -582,6 +547,8 @@ body {
     justify-content: space-between;
     overflow-y: auto;
 }
+
+/* Override global scrollbar styles for the lightbox panel — no glow inside a contained element */
 .lightbox-deck::-webkit-scrollbar-track {
     background: transparent;
     border-radius: 999px;
@@ -616,12 +583,13 @@ body {
     color: var(--text-muted);
     line-height: 1.5;
 }
+
+/* desc can contain raw HTML links (set via innerHTML) */
 #lightbox-desc a {
     color: #f97316;
     text-decoration: underline;
 }
 
-/* Variations Container */
 .variation-wrap {
     margin-top: 20px;
     border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -685,7 +653,6 @@ body {
     color: var(--accent-color);
 }
 
-/* Close Button */
 .lightbox-close-btn {
     position: absolute;
     top: 16px;
@@ -711,46 +678,9 @@ body {
     transform: scale(1.05);
 }
 
-/* ==========================================
-    7. SYSTEM UTILITIES (Toast alerts & Themes)
-    ========================================== */
-.footer-settings {
-    margin-top: 16px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 12px;
-    font-size: 0.75rem;
-    color: var(--text-muted);
-}
+/* ── TOAST ──────────────────────────────────── */
 
-.theme-panel {
-    display: flex;
-    gap: 6px;
-    background: rgba(255, 255, 255, 0.02);
-    padding: 4px;
-    border-radius: 12px;
-    border: 1px solid var(--border-color);
-}
-
-.theme-btn {
-    background: none;
-    border: none;
-    color: var(--text-muted);
-    padding: 4px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    font-size: 0.7rem;
-    font-weight: 600;
-    transition: all var(--transition-speed) ease;
-}
-
-.theme-btn.active {
-    background: var(--accent-color);
-    color: var(--bg-color);
-}
-
-/* Copy Dialog Toast Notification Alert */
+/* Slides up from bottom, auto-dismissed after 2.5s via JS */
 .toast-msg {
     position: fixed;
     bottom: 30px;
@@ -775,11 +705,12 @@ body {
 }
 
 @keyframes breathe {
-    0% { transform: scale(1); opacity: 0.4; filter: blur(2px); }
+    0%   { transform: scale(1);    opacity: 0.4; filter: blur(2px); }
     100% { transform: scale(1.02); opacity: 0.7; filter: blur(4px); }
 }
 
-/* Responsive Breakpoints */
+/* ── RESPONSIVE ─────────────────────────────── */
+
 @media (max-width: 900px) {
     .profile-header {
         flex-direction: column;
@@ -790,12 +721,13 @@ body {
         max-width: 100%;
         justify-content: flex-start;
     }
-    .gallery-masonry {
-        columns: 3 200px;
+    .gallery-card {
+        width: calc(50% - 8px);
     }
 }
 
 @media (max-width: 768px) {
+    /* Switch lightbox to single column, split viewport/deck vertically */
     .lightbox-window {
         grid-template-columns: 1fr;
         height: 80vh;
@@ -811,13 +743,10 @@ body {
     .lightbox {
         padding: 16px;
     }
-    .gallery-masonry {
-        columns: 2 160px;
-    }
 }
 
 @media (max-width: 480px) {
-    .gallery-masonry {
-        columns: 1 100%;
+    .gallery-card {
+        width: 100%;
     }
 }

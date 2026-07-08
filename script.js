@@ -22,9 +22,6 @@ const linksDatabase = [
     }
 ];
 
-
-
-// Generate custom Solo.to link boxes at top of dashboard
 function bootstrapLinks() {
     const container = document.getElementById('links-container');
     container.innerHTML = '';
@@ -47,7 +44,6 @@ function bootstrapLinks() {
     });
 }
 
-// Generate visual masonry card elements with hover swap features!
 function bootstrapGallery() {
     const container = document.getElementById('gallery-container');
     container.innerHTML = '';
@@ -79,6 +75,8 @@ function bootstrapGallery() {
             </div>
             <div class="card-variations-bar" id="indicator-bar-${index}"></div>
         `;
+
+        // Countdown timer for video cards
         if (isVideo) {
             const timer = document.createElement('span');
             timer.className = 'video-timer';
@@ -92,7 +90,6 @@ function bootstrapGallery() {
                 const secs = String(duration % 60).padStart(2, '0');
                 timer.innerText = `${mins}:${secs}`;
             });
-
             vid.addEventListener('timeupdate', () => {
                 const remaining = Math.floor(vid.duration - vid.currentTime);
                 const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
@@ -102,7 +99,8 @@ function bootstrapGallery() {
         }
 
         container.appendChild(card);
-        // Inject mini swappers inside indicator bar
+
+        // Inject mini variation swapper thumbnails into the indicator bar
         const bar = document.getElementById(`indicator-bar-${index}`);
         if (render.variations && render.variations.length > 1) {
             render.variations.forEach((variant, vIdx) => {
@@ -113,12 +111,12 @@ function bootstrapGallery() {
                 box.title = variant.label;
                 box.innerHTML = `
                     <img src="${variantSrc}" alt="${variant.label}">
-                    ${variant.type === "video" ? `<i class="var-video-badge fa-solid fa-video"></i>` : ''}
+                    ${isVarVideo ? `<i class="var-video-badge fa-solid fa-video"></i>` : ''}
                 `;
 
                 box.onclick = (e) => {
                     e.stopPropagation();
-                    
+
                     const siblings = bar.querySelectorAll('.mini-swapper-box');
                     siblings.forEach(sib => sib.classList.remove('active'));
                     box.classList.add('active');
@@ -128,7 +126,7 @@ function bootstrapGallery() {
                     const currentIsVideo = mediaNode.tagName === 'VIDEO';
 
                     if (varIsVideo === currentIsVideo) {
-                        // Same type, just swap src
+                        // Same media type — just swap the src
                         mediaNode.style.opacity = '0.7';
                         setTimeout(() => {
                             mediaNode.src = variant.url;
@@ -137,7 +135,7 @@ function bootstrapGallery() {
                             setTimeout(() => msnry?.layout(), 150);
                         }, 100);
                     } else if (varIsVideo) {
-                        // Switching image → video
+                        // Switching from image to video
                         const vid = document.createElement('video');
                         vid.id = `card-img-${index}`;
                         vid.className = mediaNode.className;
@@ -149,7 +147,7 @@ function bootstrapGallery() {
                         mediaNode.replaceWith(vid);
                         setTimeout(() => msnry?.layout(), 150);
                     } else {
-                        // Switching video → image
+                        // Switching from video to image
                         const img = document.createElement('img');
                         img.id = `card-img-${index}`;
                         img.className = mediaNode.className;
@@ -168,6 +166,7 @@ function bootstrapGallery() {
 
     document.getElementById('gallery-count').innerText = `${rendersDatabase.length} Projects`;
 
+    // Initialize Masonry after all images have loaded to avoid layout miscalculations
     const grid = document.getElementById('gallery-container');
     imagesLoaded(grid, () => {
         msnry = new Masonry(grid, {
@@ -176,12 +175,38 @@ function bootstrapGallery() {
             gutter: 16,
             fitWidth: false
         });
+        // Fallback re-layout for slow or GIF images that imagesLoaded may miss
         setTimeout(() => msnry.layout(), 500);
     });
 }
 
+// Helper: attach countdown timer events to a video element, updating a timer span
+function attachVideoTimer(vid, timer) {
+    vid.addEventListener('loadedmetadata', () => {
+        const remaining = Math.floor(vid.duration);
+        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const secs = String(remaining % 60).padStart(2, '0');
+        timer.innerText = `${mins}:${secs}`;
+    });
+    vid.addEventListener('timeupdate', () => {
+        const remaining = Math.floor(vid.duration - vid.currentTime);
+        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const secs = String(remaining % 60).padStart(2, '0');
+        timer.innerText = `${mins}:${secs}`;
+    });
+}
 
-// Lightbox modal controller
+// Helper: create and attach a lightbox video timer to the viewport
+function createLightboxTimer(vid) {
+    document.getElementById('lightbox-video-timer')?.remove();
+    const timer = document.createElement('span');
+    timer.id = 'lightbox-video-timer';
+    timer.className = 'video-timer';
+    timer.innerText = '00:00';
+    document.querySelector('.lightbox-viewport').appendChild(timer);
+    attachVideoTimer(vid, timer);
+}
+
 function revealLightbox(index) {
     const render = rendersDatabase[index];
     const modal = document.getElementById('viewer-lightbox');
@@ -206,35 +231,12 @@ function revealLightbox(index) {
         }
         vid.src = currentCardImg;
         vid.style.display = 'block';
+        createLightboxTimer(vid);
     } else {
         document.getElementById('lightbox-main-video')?.remove();
+        document.getElementById('lightbox-video-timer')?.remove();
         lightboxMedia.style.display = 'block';
         lightboxMedia.src = currentCardImg;
-    }
-
-    const existingTimer = document.getElementById('lightbox-video-timer');
-    if (existingTimer) existingTimer.remove();
-
-    if (isVideo) {
-        const timer = document.createElement('span');
-        timer.id = 'lightbox-video-timer';
-        timer.className = 'video-timer';
-        timer.innerText = '00:00';
-        document.querySelector('.lightbox-viewport').appendChild(timer);
-
-        const vid = document.getElementById('lightbox-main-video');
-        vid.addEventListener('loadedmetadata', () => {
-            const remaining = Math.floor(vid.duration);
-            const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-            const secs = String(remaining % 60).padStart(2, '0');
-            timer.innerText = `${mins}:${secs}`;
-        });
-        vid.addEventListener('timeupdate', () => {
-            const remaining = Math.floor(vid.duration - vid.currentTime);
-            const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-            const secs = String(remaining % 60).padStart(2, '0');
-            timer.innerText = `${mins}:${secs}`;
-        });
     }
 
     document.getElementById('lightbox-title').innerHTML = render.title;
@@ -246,7 +248,7 @@ function revealLightbox(index) {
 
     if (render.variations && render.variations.length > 1) {
         wrapper.style.display = 'block';
-        render.variations.forEach((variant, vIdx) => {
+        render.variations.forEach((variant) => {
             const isActive = currentCardImg === variant.url;
             const btn = document.createElement('button');
             btn.className = 'variation-thumb-btn' + (isActive ? ' active' : '');
@@ -280,27 +282,8 @@ function revealLightbox(index) {
                         vid.load();
                         vid.style.opacity = '1';
                     }, 120);
-                    const existingTimer = document.getElementById('lightbox-video-timer');
-                    if (existingTimer) existingTimer.remove();
-                    const timer = document.createElement('span');
-                    timer.id = 'lightbox-video-timer';
-                    timer.className = 'video-timer';
-                    timer.innerText = '00:00';
-                    document.querySelector('.lightbox-viewport').appendChild(timer);
-
                     vid = document.getElementById('lightbox-main-video');
-                    vid.addEventListener('loadedmetadata', () => {
-                        const remaining = Math.floor(vid.duration);
-                        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-                        const secs = String(remaining % 60).padStart(2, '0');
-                        timer.innerText = `${mins}:${secs}`;
-                    });
-                    vid.addEventListener('timeupdate', () => {
-                        const remaining = Math.floor(vid.duration - vid.currentTime);
-                        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-                        const secs = String(remaining % 60).padStart(2, '0');
-                        timer.innerText = `${mins}:${secs}`;
-                    });
+                    createLightboxTimer(vid);
                 } else {
                     if (vid) {
                         vid.style.opacity = '0';
@@ -315,12 +298,13 @@ function revealLightbox(index) {
                     document.getElementById('lightbox-video-timer')?.remove();
                 }
             };
+
             const isVarVideo = variant.type === "video";
             const variantSrc = isVarVideo ? variant.thumb : variant.url;
             btn.innerHTML = `
                 <div style="position:relative; display:inline-block;">
                     <img class="variation-preview-img" src="${variantSrc}" alt="${variant.label}" onerror="this.src='https://placehold.co/150x100/0f121d/f97316?text=View'">
-                    ${variant.type === "video" ? `<i class="fa-solid fa-video" style="position:absolute; top:10%; left:10%; transform:translate(-10%,-10%); font-size:1.4rem; color:white; opacity:0.9; pointer-events:none;"></i>` : ''}
+                    ${isVarVideo ? `<i class="fa-solid fa-video" style="position:absolute; top:10%; left:10%; transform:translate(-10%,-10%); font-size:1.4rem; color:white; opacity:0.9; pointer-events:none;"></i>` : ''}
                 </div>
                 <span class="variation-label">${variant.label}</span>
             `;
@@ -337,7 +321,6 @@ function dismissLightbox() {
     document.getElementById('viewer-lightbox').classList.remove('active');
 }
 
-// Clip Discord copy with standard fallback selector
 function copyDiscordName() {
     const dummy = document.createElement('textarea');
     dummy.value = discordUserTag;
@@ -348,12 +331,9 @@ function copyDiscordName() {
 
     const toast = document.getElementById('alert-toast');
     toast.classList.add('show');
-    setTimeout(() => {
-        toast.classList.remove('show');
-    }, 2500);
+    setTimeout(() => toast.classList.remove('show'), 2500);
 }
 
-// Initialize script configs on DOM Load
 window.onload = function() {
     document.getElementById('discord-tag-display').innerText = discordUserTag;
     bootstrapLinks();
