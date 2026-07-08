@@ -14,7 +14,7 @@
         // Some privacy modes throw on sessionStorage access — skip the dedupe check.
     }
 
-    const endpoint = `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/up/${COUNTER_NAME}`;
+    const endpoint = `https://api.counterapi.dev/v1/${COUNTER_NAMESPACE}/${COUNTER_NAME}/up`;
 
     fetch(endpoint, { keepalive: true })
         .then(() => {
