@@ -3,7 +3,7 @@ const rendersDatabase = [
     title: "Obsidian and Gold Spear/Trident",
     desc:
       'Original art from <a href="https://www.deviantart.com/yuhanoone/art/Closed-Weapon-Adoptable-Auction-436-1084068141"' +
-      'target="_blank">yuhanoone on DeviantArt</a>',
+      ' target="_blank">yuhanoone on DeviantArt</a>',
     mainImg: "https://ik.imagekit.io/fireninja/Spear3.png?updatedAt=1781901982859",
     variations: [
       {
@@ -35,7 +35,7 @@ const rendersDatabase = [
     title: "Sword",
     desc:
       'Original art from <a href="https://www.deviantart.com/yuhanoone/art/Closed-Weapon-Adoptable-Auction-429-1074127727"' +
-      'target="_blank">yuhanoone on DeviantArt</a>',
+      ' target="_blank">yuhanoone on DeviantArt</a>',
     mainImg: "https://ik.imagekit.io/fireninja/BlueSwordRender1.png?updatedAt=1781901986264",
     variations: [
       {
@@ -267,7 +267,7 @@ const rendersDatabase = [
     title: "Nail Gun",
     desc:
       'Art From <a href="https://x.com/Zen_jirakun/status/2016873970251800741/photo/2"' +
-      'target="_blank">Zen_Ji on X</a>',
+      ' target="_blank">Zen_Ji on X</a>',
     mainImg: "https://ik.imagekit.io/fireninja/NailGun4.png?updatedAt=1781901966970",
     variations: [
       {

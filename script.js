@@ -1,5 +1,13 @@
 const discordUserTag = "fireninja.";
-let msnry;
+
+/* Masonry instance for the gallery grid. Assigned once images have loaded
+   and re-used by media-swap handlers to re-run layout after a card's
+   size changes (e.g. swapping between an image and a video variant). */
+let masonryInstance;
+
+/* Fallback placeholder images shown when a real asset fails to load. */
+const RENDER_FALLBACK_IMG = "https://placehold.co/600x600/0f121d/f97316?text=Render";
+const VARIATION_FALLBACK_IMG = "https://placehold.co/150x100/0f121d/f97316?text=View";
 
 const linksDatabase = [
     {
@@ -22,6 +30,35 @@ const linksDatabase = [
     }
 ];
 
+/* Creates a <video> element configured for autoplaying, looping,
+   muted, inline preview playback. Used anywhere a render variant
+   needs to be swapped in or newly displayed as a video. */
+function createVideoElement(id, className, src) {
+    const vid = document.createElement('video');
+    vid.id = id;
+    vid.className = className;
+    vid.src = src;
+    vid.autoplay = true;
+    vid.loop = true;
+    vid.muted = true;
+    vid.setAttribute('playsinline', '');
+    return vid;
+}
+
+/* Creates an <img> element with the shared render fallback wired up
+   to onerror. Used anywhere a render variant needs to be swapped in
+   or newly displayed as an image. */
+function createImageElement(id, className, src, alt) {
+    const img = document.createElement('img');
+    img.id = id;
+    img.className = className;
+    img.src = src;
+    img.alt = alt || '';
+    img.onerror = () => { img.src = RENDER_FALLBACK_IMG; };
+    return img;
+}
+
+/* Populates the nav links grid from linksDatabase. */
 function bootstrapLinks() {
     const container = document.getElementById('links-container');
     container.innerHTML = '';
@@ -44,6 +81,39 @@ function bootstrapLinks() {
     });
 }
 
+/* Attaches countdown-timer behavior to a video element, updating the
+   given <span> with the remaining playback time (mm:ss). Shared by
+   both gallery card thumbnails and the lightbox video view. */
+function attachVideoTimer(vid, timer) {
+    vid.addEventListener('loadedmetadata', () => {
+        const duration = Math.floor(vid.duration);
+        const mins = String(Math.floor(duration / 60)).padStart(2, '0');
+        const secs = String(duration % 60).padStart(2, '0');
+        timer.innerText = `${mins}:${secs}`;
+    });
+    vid.addEventListener('timeupdate', () => {
+        const remaining = Math.floor(vid.duration - vid.currentTime);
+        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
+        const secs = String(remaining % 60).padStart(2, '0');
+        timer.innerText = `${mins}:${secs}`;
+    });
+}
+
+/* Creates and attaches a video countdown timer to the lightbox viewport,
+   replacing any timer left over from a previous variant. */
+function createLightboxTimer(vid) {
+    document.getElementById('lightbox-video-timer')?.remove();
+    const timer = document.createElement('span');
+    timer.id = 'lightbox-video-timer';
+    timer.className = 'video-timer';
+    timer.innerText = '00:00';
+    document.querySelector('.lightbox-viewport').appendChild(timer);
+    attachVideoTimer(vid, timer);
+}
+
+/* Populates the masonry gallery from rendersDatabase (defined in images.js),
+   wiring up each card's click-to-open-lightbox behavior and, where a render
+   has multiple variations, its mini variation-swapper thumbnails. */
 function bootstrapGallery() {
     const container = document.getElementById('gallery-container');
     container.innerHTML = '';
@@ -65,7 +135,7 @@ function bootstrapGallery() {
                         autoplay loop muted playsinline
                         onerror="this.style.display='none'"></video>`
                 : `<img class="render-thumbnail" id="card-img-${index}" src="${render.mainImg}" alt="${render.title}"
-                        onerror="this.src='https://placehold.co/600x600/0f121d/f97316?text=Render'">`
+                        onerror="this.src='${RENDER_FALLBACK_IMG}'">`
             }
             <div class="card-hover-overlay ${render.variations && render.variations.length > 1 ? '' : 'no-variants'}">
                 <span class="overlay-title">${render.title}</span>
@@ -76,31 +146,19 @@ function bootstrapGallery() {
             <div class="card-variations-bar" id="indicator-bar-${index}"></div>
         `;
 
-        // Countdown timer for video cards
+        // Countdown timer for video cards, using the shared timer helper.
         if (isVideo) {
             const timer = document.createElement('span');
             timer.className = 'video-timer';
             timer.innerText = '00:00';
             card.appendChild(timer);
 
-            const vid = card.querySelector('.render-thumbnail');
-            vid.addEventListener('loadedmetadata', () => {
-                const duration = Math.floor(vid.duration);
-                const mins = String(Math.floor(duration / 60)).padStart(2, '0');
-                const secs = String(duration % 60).padStart(2, '0');
-                timer.innerText = `${mins}:${secs}`;
-            });
-            vid.addEventListener('timeupdate', () => {
-                const remaining = Math.floor(vid.duration - vid.currentTime);
-                const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-                const secs = String(remaining % 60).padStart(2, '0');
-                timer.innerText = `${mins}:${secs}`;
-            });
+            attachVideoTimer(card.querySelector('.render-thumbnail'), timer);
         }
 
         container.appendChild(card);
 
-        // Inject mini variation swapper thumbnails into the indicator bar
+        // Inject mini variation swapper thumbnails into the indicator bar.
         const bar = document.getElementById(`indicator-bar-${index}`);
         if (render.variations && render.variations.length > 1) {
             render.variations.forEach((variant, vIdx) => {
@@ -126,36 +184,21 @@ function bootstrapGallery() {
                     const currentIsVideo = mediaNode.tagName === 'VIDEO';
 
                     if (varIsVideo === currentIsVideo) {
-                        // Same media type — just swap the src
+                        // Same media type — just swap the src.
                         mediaNode.style.opacity = '0.7';
                         setTimeout(() => {
                             mediaNode.src = variant.url;
                             if (varIsVideo) mediaNode.load?.();
                             mediaNode.style.opacity = '1';
-                            setTimeout(() => msnry?.layout(), 150);
+                            setTimeout(() => masonryInstance?.layout(), 150);
                         }, 100);
-                    } else if (varIsVideo) {
-                        // Switching from image to video
-                        const vid = document.createElement('video');
-                        vid.id = `card-img-${index}`;
-                        vid.className = mediaNode.className;
-                        vid.src = variant.url;
-                        vid.autoplay = true;
-                        vid.loop = true;
-                        vid.muted = true;
-                        vid.setAttribute('playsinline', '');
-                        mediaNode.replaceWith(vid);
-                        setTimeout(() => msnry?.layout(), 150);
                     } else {
-                        // Switching from video to image
-                        const img = document.createElement('img');
-                        img.id = `card-img-${index}`;
-                        img.className = mediaNode.className;
-                        img.src = variant.url;
-                        img.alt = render.title;
-                        img.onerror = () => img.src = 'https://placehold.co/600x600/0f121d/f97316?text=Render';
-                        mediaNode.replaceWith(img);
-                        setTimeout(() => msnry?.layout(), 150);
+                        // Media type changed — replace the element outright.
+                        const replacement = varIsVideo
+                            ? createVideoElement(`card-img-${index}`, mediaNode.className, variant.url)
+                            : createImageElement(`card-img-${index}`, mediaNode.className, variant.url, render.title);
+                        mediaNode.replaceWith(replacement);
+                        setTimeout(() => masonryInstance?.layout(), 150);
                     }
                 };
 
@@ -166,47 +209,22 @@ function bootstrapGallery() {
 
     document.getElementById('gallery-count').innerText = `${rendersDatabase.length} Projects`;
 
-    // Initialize Masonry after all images have loaded to avoid layout miscalculations
+    // Initialize Masonry after all images have loaded to avoid layout miscalculations.
     const grid = document.getElementById('gallery-container');
     imagesLoaded(grid, () => {
-        msnry = new Masonry(grid, {
+        masonryInstance = new Masonry(grid, {
             itemSelector: '.gallery-card',
             columnWidth: '.gallery-card',
             gutter: 16,
             fitWidth: false
         });
-        // Fallback re-layout for slow or GIF images that imagesLoaded may miss
-        setTimeout(() => msnry.layout(), 500);
+        // Fallback re-layout for slow or GIF images that imagesLoaded may miss.
+        setTimeout(() => masonryInstance.layout(), 500);
     });
 }
 
-// Helper: attach countdown timer events to a video element, updating a timer span
-function attachVideoTimer(vid, timer) {
-    vid.addEventListener('loadedmetadata', () => {
-        const remaining = Math.floor(vid.duration);
-        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-        const secs = String(remaining % 60).padStart(2, '0');
-        timer.innerText = `${mins}:${secs}`;
-    });
-    vid.addEventListener('timeupdate', () => {
-        const remaining = Math.floor(vid.duration - vid.currentTime);
-        const mins = String(Math.floor(remaining / 60)).padStart(2, '0');
-        const secs = String(remaining % 60).padStart(2, '0');
-        timer.innerText = `${mins}:${secs}`;
-    });
-}
-
-// Helper: create and attach a lightbox video timer to the viewport
-function createLightboxTimer(vid) {
-    document.getElementById('lightbox-video-timer')?.remove();
-    const timer = document.createElement('span');
-    timer.id = 'lightbox-video-timer';
-    timer.className = 'video-timer';
-    timer.innerText = '00:00';
-    document.querySelector('.lightbox-viewport').appendChild(timer);
-    attachVideoTimer(vid, timer);
-}
-
+/* Opens the lightbox for the render at the given index, showing its
+   current media (image or video) plus its variation thumbnails, if any. */
 function revealLightbox(index) {
     const render = rendersDatabase[index];
     const modal = document.getElementById('viewer-lightbox');
@@ -220,16 +238,11 @@ function revealLightbox(index) {
 
         let vid = document.getElementById('lightbox-main-video');
         if (!vid) {
-            vid = document.createElement('video');
-            vid.id = 'lightbox-main-video';
-            vid.className = lightboxMedia.className;
-            vid.autoplay = true;
-            vid.loop = true;
-            vid.muted = true;
-            vid.setAttribute('playsinline', '');
+            vid = createVideoElement('lightbox-main-video', lightboxMedia.className, currentCardImg);
             lightboxMedia.parentNode.insertBefore(vid, lightboxMedia);
+        } else {
+            vid.src = currentCardImg;
         }
-        vid.src = currentCardImg;
         vid.style.display = 'block';
         createLightboxTimer(vid);
     } else {
@@ -266,13 +279,7 @@ function revealLightbox(index) {
                     img.style.display = 'none';
                     img.style.opacity = '1';
                     if (!vid) {
-                        vid = document.createElement('video');
-                        vid.id = 'lightbox-main-video';
-                        vid.className = img.className;
-                        vid.autoplay = true;
-                        vid.loop = true;
-                        vid.muted = true;
-                        vid.setAttribute('playsinline', '');
+                        vid = createVideoElement('lightbox-main-video', img.className, '');
                         img.parentNode.insertBefore(vid, img);
                     }
                     vid.style.opacity = '0';
@@ -303,7 +310,7 @@ function revealLightbox(index) {
             const variantSrc = isVarVideo ? variant.thumb : variant.url;
             btn.innerHTML = `
                 <div style="position:relative; display:inline-block;">
-                    <img class="variation-preview-img" src="${variantSrc}" alt="${variant.label}" onerror="this.src='https://placehold.co/150x100/0f121d/f97316?text=View'">
+                    <img class="variation-preview-img" src="${variantSrc}" alt="${variant.label}" onerror="this.src='${VARIATION_FALLBACK_IMG}'">
                     ${isVarVideo ? `<i class="fa-solid fa-video" style="position:absolute; top:10%; left:10%; transform:translate(-10%,-10%); font-size:1.4rem; color:white; opacity:0.9; pointer-events:none;"></i>` : ''}
                 </div>
                 <span class="variation-label">${variant.label}</span>
@@ -321,17 +328,37 @@ function dismissLightbox() {
     document.getElementById('viewer-lightbox').classList.remove('active');
 }
 
+/* Copies the Discord tag to the clipboard using the modern Clipboard API,
+   falling back to the legacy execCommand approach only if needed (older
+   browsers, or non-HTTPS contexts where Clipboard API isn't available). */
 function copyDiscordName() {
-    const dummy = document.createElement('textarea');
-    dummy.value = discordUserTag;
-    document.body.appendChild(dummy);
-    dummy.select();
-    document.execCommand('copy');
-    document.body.removeChild(dummy);
+    const showToast = () => {
+        const toast = document.getElementById('alert-toast');
+        toast.classList.add('show');
+        setTimeout(() => toast.classList.remove('show'), 2500);
+    };
 
-    const toast = document.getElementById('alert-toast');
-    toast.classList.add('show');
-    setTimeout(() => toast.classList.remove('show'), 2500);
+    if (navigator.clipboard?.writeText) {
+        navigator.clipboard.writeText(discordUserTag).then(showToast).catch(() => {
+            copyDiscordNameLegacy();
+            showToast();
+        });
+    } else {
+        copyDiscordNameLegacy();
+        showToast();
+    }
+}
+
+/* Legacy clipboard fallback using a temporary offscreen textarea +
+   document.execCommand. Kept only for browsers/contexts where the
+   Clipboard API isn't available. */
+function copyDiscordNameLegacy() {
+    const tempTextarea = document.createElement('textarea');
+    tempTextarea.value = discordUserTag;
+    document.body.appendChild(tempTextarea);
+    tempTextarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempTextarea);
 }
 
 window.onload = function() {
