@@ -67,6 +67,8 @@ function bootstrapLinks() {
         anchor.className = 'social-link-item';
         anchor.href = link.url;
         anchor.target = '_blank';
+        anchor.setAttribute('data-umami-event', 'Link Click');
+        anchor.setAttribute('data-umami-event-target', link.title);
         anchor.innerHTML = `
             <div class="link-icon-box">
                 <i class="${link.iconClass}"></i>
@@ -175,6 +177,10 @@ function bootstrapGallery() {
                 box.onclick = (e) => {
                     e.stopPropagation();
 
+                    if (window.umami) {
+                        umami.track('Swap Variant', { title: render.title, variant: `${render.title} — ${variant.label}`, from: 'card' });
+                    }
+
                     const siblings = bar.querySelectorAll('.mini-swapper-box');
                     siblings.forEach(sib => sib.classList.remove('active'));
                     box.classList.add('active');
@@ -229,6 +235,10 @@ function revealLightbox(index) {
     const render = rendersDatabase[index];
     const modal = document.getElementById('viewer-lightbox');
 
+    if (window.umami) {
+        umami.track('View Project', { title: render.title });
+    }
+
     const currentCardImg = document.getElementById(`card-img-${index}`).src;
     const lightboxMedia = document.getElementById('lightbox-main-img');
     const isVideo = currentCardImg.toLowerCase().includes('.mp4');
@@ -270,6 +280,10 @@ function revealLightbox(index) {
                 e.stopPropagation();
                 document.querySelectorAll('.variation-thumb-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
+
+                if (window.umami) {
+                    umami.track('Swap Variant', { title: render.title, variant: `${render.title} — ${variant.label}`, from: 'lightbox' });
+                }
 
                 const varIsVideo = variant.url.toLowerCase().includes('.mp4');
                 const img = document.getElementById('lightbox-main-img');
@@ -338,6 +352,10 @@ function copyDiscordName() {
         setTimeout(() => toast.classList.remove('show'), 2500);
     };
 
+    if (window.umami) {
+        umami.track('Copy Discord Tag');
+    }
+
     if (navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(discordUserTag).then(showToast).catch(() => {
             copyDiscordNameLegacy();
@@ -366,3 +384,12 @@ window.onload = function() {
     bootstrapLinks();
     bootstrapGallery();
 };
+
+/* Fires a single engagement event after 10s so Umami records this as an
+   active session (affects bounce rate and visit duration), rather than
+   a bounce if the visitor never triggers another pageview or event. */
+setTimeout(() => {
+    if (window.umami) {
+        umami.track('Engaged Visitor (10s)');
+    }
+}, 10000);
