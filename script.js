@@ -239,6 +239,9 @@ function revealLightbox(index) {
         umami.track('View Project', { title: render.title });
     }
 
+    /* Backup counter, independent of Umami — see analytics.js. */
+    fetch('https://countapi.mileshilliard.com/api/v1/hit/fn-portfolio-renders-clicked', { keepalive: true }).catch(() => { /* best-effort */ });
+
     const currentCardImg = document.getElementById(`card-img-${index}`).src;
     const lightboxMedia = document.getElementById('lightbox-main-img');
     const isVideo = currentCardImg.toLowerCase().includes('.mp4');
