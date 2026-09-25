@@ -188,21 +188,21 @@ const rendersDatabase = [
   {
     title: "Assault Shield",
     desc: "Art From <a href='https://x.com/Zen_jirakun/status/2016150640385462599/photo/3' target='_blank'>Zen_Ji on X</a>",
-    mainImg: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/RenderedAnimation.mp4",
+    mainImg: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/0001-0180.mp4",
     variations: [
       {
         label: "Animated View",
-        url: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/RenderedAnimation.mp4",
-        thumb: "https://ik.imagekit.io/fireninja/AssaultShield2.png?updatedAt=1781901954276",
+        url: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/0001-0180.mp4",
+        thumb: "https://ik.imagekit.io/fireninja/AssaultShield.png",
         type: "video",
       },
       {
         label: "Static - Open",
-        url: "https://ik.imagekit.io/fireninja/AssaultShield1.png?updatedAt=1781901956876",
+        url: "https://ik.imagekit.io/fireninja/AssaultShieldOpen.png",
       },
       {
         label: "Static - Closed",
-        url: "https://ik.imagekit.io/fireninja/AssaultShield2.png?updatedAt=1781901954276",
+        url: "https://ik.imagekit.io/fireninja/AssaultShield.png",
       },
     ],
   },
@@ -264,36 +264,29 @@ const rendersDatabase = [
     ],
   },
   {
-    title: "Nail Gun",
+    title: "Nail Cannon",
     desc:
-      'Art From <a href="https://x.com/Zen_jirakun/status/2016873970251800741/photo/2"' +
+      'A Railgun \nArt From <a href="https://x.com/Zen_jirakun/status/2016873970251800741/photo/2"' +
       ' target="_blank">Zen_Ji on X</a>',
-    mainImg: "https://ik.imagekit.io/fireninja/NailGun4.png?updatedAt=1781901966970",
+    mainImg: "https://ik.imagekit.io/fireninja/NailGunNewTextures4.png",
     variations: [
       {
         label: "Main View",
-        url: "https://ik.imagekit.io/fireninja/NailGun4.png?updatedAt=1781901966970",
+        url: "https://ik.imagekit.io/fireninja/NailGunNewTextures2.png",
       },
       {
         label: "Alternate View",
-        url: "https://ik.imagekit.io/fireninja/NailGun7.png?updatedAt=1781901969622",
+        url: "https://ik.imagekit.io/fireninja/NailGunNewTextures3.png",
       },
       {
         label: "Alternate View",
-        url: "https://ik.imagekit.io/fireninja/NailGun8.png?updatedAt=1781901967965",
+        url: "https://ik.imagekit.io/fireninja/NailGunNewTextures5.png",
       },
       {
         label: "Alternate View",
-        url: "https://ik.imagekit.io/fireninja/NailGun5.png?updatedAt=1781901941881",
+        url: "https://ik.imagekit.io/fireninja/NailGunNewTextures4.png",
       },
-      {
-        label: "Alternate View",
-        url: "https://ik.imagekit.io/fireninja/NailGun6.png?updatedAt=1781901970944",
-      },
-      {
-        label: "Alternate View",
-        url: "https://ik.imagekit.io/fireninja/NailGun10.png?updatedAt=1781901972561",
-      },
+
     ],
   },
   {
@@ -464,7 +457,18 @@ const rendersDatabase = [
       },
     ],
   },
-  /* Template
+  {
+    title: "Cart",
+    desc: "Alternate views have older textures",
+    mainImg: "https://ik.imagekit.io/fireninja/Cart4.png",
+    variations: [
+        { label: "Main View", url: "https://ik.imagekit.io/fireninja/Cart4.png" },
+        { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Cart1.png" },
+        { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Cart2.png" },
+        { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Cart3.png" },
+    ]
+  },
+/*
     {
         title: "",
         desc: "",
@@ -473,5 +477,6 @@ const rendersDatabase = [
             { label: "Main View", url: "" }
         ]
     },
-    */
+  Template
+*/
 ];
