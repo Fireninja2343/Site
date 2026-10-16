@@ -517,7 +517,7 @@ const rendersDatabase = [
     variations: [
       {
         label: "Animated View",
-        url: "",
+        url: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/SnowFlakeAnimation.mp4",
         thumb: "https://ik.imagekit.io/fireninja/Snowflake7.png",
         type: "video",
       },
@@ -555,7 +555,7 @@ const rendersDatabase = [
     variations: [
       {
         label: "Animated View",
-        url: "",
+        url: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/MagicCircleAnimation.mp4",
         thumb: "https://ik.imagekit.io/fireninja/Circle5.png",
         type: "video",
       },
