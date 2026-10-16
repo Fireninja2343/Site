@@ -462,8 +462,37 @@ const rendersDatabase = [
         label: "Alternate View",
         url: "https://ik.imagekit.io/fireninja/Flutrane4.png?updatedAt=1781901964547",
       },
+      
     ],
   },
+      {
+        title: "Snowflake",
+        desc: "Everchanging Snowflake",
+        mainImg: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/SnowFlakeAnimation.mp4",
+        variations: [
+            { label: "Animated View", url: "", thumb: "https://ik.imagekit.io/fireninja/Snowflake7.png", type: "video" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Snowflake2.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Snowflake3.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Snowflake4.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Snowflake5.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Snowflake6.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Snowflake7.png" },
+        ]
+    },
+        {
+        title: "Magic Circle",
+        desc: "Magic Circle thing",
+        mainImg: "https://raw.githubusercontent.com/Fireninja2343/VideoRenders/main/MagicCircleAnimation.mp4",
+        variations: [
+            { label: "Animated View", url: "", thumb: "https://ik.imagekit.io/fireninja/Circle5.png", type: "video" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Circle1.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Circle2.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Circle3.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Circle4.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Circle5.png" },
+            { label: "Alternate View", url: "https://ik.imagekit.io/fireninja/Circle6.png" },
+        ]
+    },
   /* Template
     {
         title: "",
