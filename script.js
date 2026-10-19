@@ -32,7 +32,7 @@ const linksDatabase = [
         title:"Tagify Profile",
         subtitle: "Tagging my music",
         url: "https://community.tagify.fm/@fireninja",
-        iconClass: "fa-solids fa-tag"
+        iconClass: "fa-solid fa-tag"
     }
 ];
 
