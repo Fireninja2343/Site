@@ -35,6 +35,12 @@ const linksDatabase = [
         subtitle: "Tracking my music listening stats",
         url: "https://www.last.fm/user/Fireninja2343",
         iconClass: "fa-brands fa-lastfm"
+    },
+    {
+        title:"Tagify Profile",
+        subtitle: "Tagging my music",
+        url: "https://community.tagify.fm/@fireninja",
+        iconClass: "fa-solid fa-tag"
     }
 ];
 
