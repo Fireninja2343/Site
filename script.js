@@ -9,6 +9,14 @@ let masonryInstance;
 const RENDER_FALLBACK_IMG = "https://placehold.co/600x600/0f121d/f97316?text=Render";
 const VARIATION_FALLBACK_IMG = "https://placehold.co/150x100/0f121d/f97316?text=View";
 
+/* Thin wrapper over analytics.js's fnTrackEvent: bumps the countapi
+   counter for this interaction and mirrors the event into Umami.
+   Falls back to Umami-only if analytics.js didn't load. */
+function trackEvent(counterKey, umamiName, umamiData) {
+    if (window.fnTrackEvent) return window.fnTrackEvent(counterKey, umamiName, umamiData);
+    if (umamiName && window.umami) window.umami.track(umamiName, umamiData);
+}
+
 const linksDatabase = [
     {
         title: "AniList Profile",
@@ -69,6 +77,9 @@ function bootstrapLinks() {
         anchor.target = '_blank';
         anchor.setAttribute('data-umami-event', 'Link Click');
         anchor.setAttribute('data-umami-event-target', link.title);
+        anchor.addEventListener('click', () => {
+            trackEvent('fn-portfolio-ev-link-click', 'Link Click', { target: link.title });
+        });
         anchor.innerHTML = `
             <div class="link-icon-box">
                 <i class="${link.iconClass}"></i>
@@ -177,9 +188,7 @@ function bootstrapGallery() {
                 box.onclick = (e) => {
                     e.stopPropagation();
 
-                    if (window.umami) {
-                        umami.track('Swap Variant', { title: render.title, variant: `${render.title} — ${variant.label}`, from: 'card' });
-                    }
+                    trackEvent('fn-portfolio-ev-swap-card', 'Swap Variant', { title: render.title, variant: `${render.title} — ${variant.label}`, from: 'card' });
 
                     const siblings = bar.querySelectorAll('.mini-swapper-box');
                     siblings.forEach(sib => sib.classList.remove('active'));
@@ -235,9 +244,7 @@ function revealLightbox(index) {
     const render = rendersDatabase[index];
     const modal = document.getElementById('viewer-lightbox');
 
-    if (window.umami) {
-        umami.track('View Project', { title: render.title });
-    }
+    trackEvent('fn-portfolio-renders-clicked', 'View Project', { title: render.title });
 
     /* Backup counter, independent of Umami — see analytics.js. */
     fetch('https://countapi.mileshilliard.com/api/v1/hit/fn-portfolio-renders-clicked', { keepalive: true }).catch(() => { /* best-effort */ });
@@ -284,9 +291,7 @@ function revealLightbox(index) {
                 document.querySelectorAll('.variation-thumb-btn').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
 
-                if (window.umami) {
-                    umami.track('Swap Variant', { title: render.title, variant: `${render.title} — ${variant.label}`, from: 'lightbox' });
-                }
+                trackEvent('fn-portfolio-ev-swap-lightbox', 'Swap Variant', { title: render.title, variant: `${render.title} — ${variant.label}`, from: 'lightbox' });
 
                 const varIsVideo = variant.url.toLowerCase().includes('.mp4');
                 const img = document.getElementById('lightbox-main-img');
@@ -355,9 +360,7 @@ function copyDiscordName() {
         setTimeout(() => toast.classList.remove('show'), 2500);
     };
 
-    if (window.umami) {
-        umami.track('Copy Discord Tag');
-    }
+    trackEvent('fn-portfolio-ev-copy-discord', 'Copy Discord Tag');
 
     if (navigator.clipboard?.writeText) {
         navigator.clipboard.writeText(discordUserTag).then(showToast).catch(() => {
@@ -392,7 +395,5 @@ window.onload = function() {
    active session (affects bounce rate and visit duration), rather than
    a bounce if the visitor never triggers another pageview or event. */
 setTimeout(() => {
-    if (window.umami) {
-        umami.track('Engaged Visitor (10s)');
-    }
+    trackEvent('fn-portfolio-ev-engaged-10s', 'Engaged Visitor (10s)');
 }, 10000);

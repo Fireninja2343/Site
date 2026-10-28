@@ -6,11 +6,24 @@
  e.g. https://countapi.mileshilliard.com/api/v1/get/fn-portfolio-visits
 
  Counter keys used (see stats.html for a combined local view):
+
+ Traffic
  - fn-portfolio-visits           one per session
  - fn-portfolio-long-visits      one per session, only if it passes 30s
- - fn-portfolio-renders-clicked  one per lightbox open (see script.js)
  - fn-portfolio-umami-ok         one per visit, if window.umami loaded
  - fn-portfolio-umami-failed     one per visit, if window.umami never loaded
+
+ Events (mirrors of the Umami events, so the local stats page can show
+ a breakdown without needing Umami's API or an API key)
+ - fn-portfolio-renders-clicked  one per lightbox open      (View Project)
+ - fn-portfolio-ev-swap-card     one per gallery-card swap  (Swap Variant)
+ - fn-portfolio-ev-swap-lightbox one per lightbox swap      (Swap Variant)
+ - fn-portfolio-ev-copy-discord  one per Discord tag copy   (Copy Discord Tag)
+ - fn-portfolio-ev-link-click    one per social link click  (Link Click)
+ - fn-portfolio-ev-engaged-10s   one per visit past 10s     (Engaged Visitor)
+
+ Adding a new event: pick a key, bump the counter list in stats.html,
+ and call fnTrackEvent(key, umamiName, umamiData) from script.js.
  */
 (function () {
     const BASE = 'https://countapi.mileshilliard.com/api/v1';
@@ -21,6 +34,17 @@
     const SESSION_FLAG = 'fn_visit_logged';
 
     const hit = (key) => fetch(`${BASE}/hit/${key}`, { keepalive: true }).catch(() => { /* best-effort */ });
+
+    /* Single call site for "something happened": bumps the matching
+       countapi counter and, when Umami actually loaded, sends the same
+       event to Umami. script.js calls this instead of umami.track
+       directly, so the local stats page and Umami stay in sync. */
+    window.fnTrackEvent = function (counterKey, umamiName, umamiData) {
+        if (counterKey) hit(counterKey);
+        if (umamiName && window.umami) {
+            window.umami.track(umamiName, umamiData);
+        }
+    };
 
     /* Count once per browser session (not per page load) so refreshing
        or navigating back and forth doesn't inflate the number. */
